@@ -1,13 +1,14 @@
-import GoogleAPITokenManager
-import OpenAPIRuntime
-import OpenAPIAsyncHTTPClient
 import Common
+import GoogleAPITokenManager
+import OpenAPIAsyncHTTPClient
+import OpenAPIRuntime
 
 extension Client {
-    public init(accountServiceFile: String,
-                configuration: Configuration = .init(),
-                transportConfiguration: AsyncHTTPClientTransport.Configuration = .init(),
-                scopes: [String] = ["https://www.googleapis.com/auth/spreadsheets"],
+    public init(
+        accountServiceFile: String,
+        configuration: Configuration = .init(),
+        transportConfiguration: AsyncHTTPClientTransport.Configuration = .init(),
+        scopes: [String] = ["https://www.googleapis.com/auth/spreadsheets"],
     ) throws {
         let tokenManager = try ServiceAccountTokenManager.loadFromFile(
             accountServiceFile,
@@ -30,16 +31,20 @@ extension Client {
         values: [[OpenAPIRuntime.OpenAPIValueContainer]],
     ) async throws -> Operations.Sheets_spreadsheets_values_append.Output {
         try await sheets_spreadsheets_values_append(
-            .init(path: .init(spreadsheetId: spreadsheetId,
-                              range: sheetName),
-                  query: .init(valueInputOption: Operations.Sheets_spreadsheets_values_append.Input.Query.ValueInputOptionPayload.userEntered),
-                  body: .json(
+            .init(
+                path: .init(
+                    spreadsheetId: spreadsheetId,
+                    range: sheetName),
+                query: .init(
+                    valueInputOption: Operations.Sheets_spreadsheets_values_append.Input.Query
+                        .ValueInputOptionPayload.userEntered),
+                body: .json(
                     .init(
                         majorDimension: .rows,
                         range: range,
                         values: values,
                     )
-                  )
+                )
             )
         )
     }
