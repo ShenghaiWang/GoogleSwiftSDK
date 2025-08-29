@@ -9,4 +9,6 @@ else {
 
 //try await GoogleSheets.run(with: serviceAccountFile)
 
-try await GoogleSlides.run(with: serviceAccountFile)
+//try await GoogleSlides.run(with: serviceAccountFile)
+
+try await GoogleDocs.run(with: serviceAccountFile)

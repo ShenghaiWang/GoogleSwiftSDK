@@ -12,6 +12,7 @@ let package = Package(
     products: [
         .library(name: "GoogleSheetsSDK", targets: ["GoogleSheetsSDK"]),
         .library(name: "GoogleSlidesSDK", targets: ["GoogleSlidesSDK"]),
+        .library(name: "GoogleDocsSDK", targets: ["GoogleDocsSDK"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.10.2"),
@@ -36,13 +37,14 @@ let package = Package(
                 "Common",
                 "GoogleSheetsSDK",
                 "GoogleSlidesSDK",
+                "GoogleDocsSDK",
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(
                     name: "OpenAPIAsyncHTTPClient", package: "swift-openapi-async-http-client"),
                 .product(name: "GoogleAPITokenManager", package: "GoogleAPITokenManager"),
             ],
             plugins: [
-                //                .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
+//                                .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
             ]
         ),
         .target(
@@ -57,6 +59,16 @@ let package = Package(
         ),
         .target(
             name: "GoogleSlidesSDK",
+            dependencies: [
+                "Common",
+                .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
+                .product(
+                    name: "OpenAPIAsyncHTTPClient", package: "swift-openapi-async-http-client"),
+                .product(name: "GoogleAPITokenManager", package: "GoogleAPITokenManager"),
+            ]
+        ),
+        .target(
+            name: "GoogleDocsSDK",
             dependencies: [
                 "Common",
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
