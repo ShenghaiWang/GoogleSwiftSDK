@@ -21,7 +21,7 @@ extension Client {
             serverURL: try Servers.Server1.url(),
             configuration: configuration,
             transport: AsyncHTTPClientTransport(configuration: transportConfiguration),
-            middlewares: [AuthenticationMiddleware(tokenManager: tokenManager)],
+            middlewares: [AuthenticationMiddleware(tokenManager: tokenManager, scopes: scopes)],
         )
     }
 

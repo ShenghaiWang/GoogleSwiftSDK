@@ -8,11 +8,13 @@ extension Client {
     enum Error: Swift.Error {
         case invalidResponse(statusCode: Int)
     }
+    
+    // Service Account Authentication (for server-to-server)
     public init(
         accountServiceFile: String,
         configuration: Configuration = .init(),
         transportConfiguration: AsyncHTTPClientTransport.Configuration = .init(),
-        scopes: [String] = ["https://www.googleapis.com/auth/gmail.modify", "https://www.googleapis.com/auth/gmail.compose"],
+        scopes: [String] = ["https://www.googleapis.com/auth/gmail.modify"],
     ) throws {
         let tokenManager = try ServiceAccountTokenManager.loadFromFile(
             accountServiceFile,
@@ -24,7 +26,32 @@ extension Client {
             serverURL: try Servers.Server1.url(),
             configuration: configuration,
             transport: AsyncHTTPClientTransport(configuration: transportConfiguration),
-            middlewares: [AuthenticationMiddleware(tokenManager: tokenManager)],
+            middlewares: [AuthenticationMiddleware(tokenManager: tokenManager, scopes: scopes)],
+        )
+    }
+    
+    // OAuth 2.0 Authentication (for personal accounts)
+    public init(
+        clientId: String,
+        clientSecret: String,
+        redirectURI: String = "http://localhost", // For desktop apps
+        configuration: Configuration = .init(),
+        transportConfiguration: AsyncHTTPClientTransport.Configuration = .init(),
+        scopes: [String] = ["https://www.googleapis.com/auth/gmail.modify"],
+        tokenStorage: (any TokenStorage)? = InMemoeryTokenStorage()
+    ) throws {
+        let tokenManager = GoogleOAuth2TokenManager(
+            clientId: clientId,
+            clientSecret: clientSecret,
+            redirectURI: redirectURI,
+            tokenStorage: tokenStorage,
+            httpClient: URLSessionHTTPClient()
+        )
+        self.init(
+            serverURL: try Servers.Server1.url(),
+            configuration: configuration,
+            transport: AsyncHTTPClientTransport(configuration: transportConfiguration),
+            middlewares: [AuthenticationMiddleware(tokenManager: tokenManager, scopes: scopes)],
         )
     }
 
@@ -32,30 +59,46 @@ extension Client {
         to: [String],
         subject: String,
         body: String
-    ) async throws -> Any {
-        // Construct MIME message
-        let toHeader = to.joined(separator: ", ")
-        let mimeMessage = """
-        To: \(toHeader)
-        Subject: \(subject)
-        Content-Type: text/plain; charset=UTF-8
-
-        \(body)
+    ) async throws -> Operations.Gmail_users_drafts_create.Output {
+        let mime = buildMime(to: to, subject: subject, body: body)
+        let base64UrlString = Data(mime.utf8).base64URLEncodedString()
+        let draftJson = """
+            {
+                "message": {
+                    "raw": "\(base64UrlString)"
+                }
+            }
         """
-//        // Encode MIME message in base64url
-//        let mimeData = mimeMessage.data(using: .utf8)!
-//        var base64Encoded = mimeData.base64EncodedString()
-//        base64Encoded = base64Encoded.replacingOccurrences(of: "+", with: "-")
-//        base64Encoded = base64Encoded.replacingOccurrences(of: "/", with: "_")
-//        base64Encoded = base64Encoded.replacingOccurrences(of: "=", with: "")
-//        // Construct body as dictionary
-//        let draftBody: [String: Any] = [
-//            "message": ["raw": base64Encoded]
-//        ]
-        // Try passing the dictionary as the body
+        let jsonData = Data(draftJson.utf8)
         return try await gmail_users_drafts_create(
-            path: .init(userId: "me"),
-            body: .messageRfc822(.init(stringLiteral: mimeMessage))
+            .init(
+                path: .init(userId: "me"),
+                body: .messageRfc822(.init(jsonData))
+            )
         )
+
+    }
+
+    // IMPORTANT: CRLF (`\r\n`) + exactly one blank line before body.
+    private func buildMime(to: [String], subject: String, body: String) -> String {
+        let recipients = to.joined(separator: ", ")
+        return "To: \(recipients)\r\n" +
+               "Subject: \(subject)\r\n" +
+               "MIME-Version: 1.0\r\n" +
+               "Content-Type: text/plain; charset=UTF-8\r\n" +
+               "\r\n" +
+               "\(body)"
+    }
+}
+
+extension Data {
+    /// URL-safe Base64 (RFC 4648 §5): replace +/ with -_ and strip '=' padding & newlines
+    func base64URLEncodedString() -> String {
+        let b64 = self.base64EncodedString()
+        return b64
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+            .replacingOccurrences(of: "\n", with: "")
     }
 }
