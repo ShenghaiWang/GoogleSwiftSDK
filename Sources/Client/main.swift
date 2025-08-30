@@ -11,4 +11,8 @@ else {
 
 //try await GoogleSlides.run(with: serviceAccountFile)
 
-try await GoogleDocs.run(with: serviceAccountFile)
+//try await GoogleDocs.run(with: serviceAccountFile)
+
+//try await GoogleCalendar.run(with: serviceAccountFile)
+
+try await GoogleGmail.run(with: serviceAccountFile)

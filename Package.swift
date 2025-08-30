@@ -13,6 +13,8 @@ let package = Package(
         .library(name: "GoogleSheetsSDK", targets: ["GoogleSheetsSDK"]),
         .library(name: "GoogleSlidesSDK", targets: ["GoogleSlidesSDK"]),
         .library(name: "GoogleDocsSDK", targets: ["GoogleDocsSDK"]),
+        .library(name: "GoogleCalendarSDK", targets: ["GoogleCalendarSDK"]),
+        .library(name: "GoogleGmailSDK", targets: ["GoogleGmailSDK"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.10.2"),
@@ -38,6 +40,8 @@ let package = Package(
                 "GoogleSheetsSDK",
                 "GoogleSlidesSDK",
                 "GoogleDocsSDK",
+                "GoogleCalendarSDK",
+                "GoogleGmailSDK",
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(
                     name: "OpenAPIAsyncHTTPClient", package: "swift-openapi-async-http-client"),
@@ -69,6 +73,26 @@ let package = Package(
         ),
         .target(
             name: "GoogleDocsSDK",
+            dependencies: [
+                "Common",
+                .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
+                .product(
+                    name: "OpenAPIAsyncHTTPClient", package: "swift-openapi-async-http-client"),
+                .product(name: "GoogleAPITokenManager", package: "GoogleAPITokenManager"),
+            ]
+        ),
+        .target(
+            name: "GoogleCalendarSDK",
+            dependencies: [
+                "Common",
+                .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
+                .product(
+                    name: "OpenAPIAsyncHTTPClient", package: "swift-openapi-async-http-client"),
+                .product(name: "GoogleAPITokenManager", package: "GoogleAPITokenManager"),
+            ]
+        ),
+        .target(
+            name: "GoogleGmailSDK",
             dependencies: [
                 "Common",
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
