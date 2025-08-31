@@ -2,40 +2,19 @@ import Common
 import GoogleAPITokenManager
 import OpenAPIAsyncHTTPClient
 import OpenAPIRuntime
+import Foundation
 
-extension Client {
+extension Client: AuthorizableClient {
+    public static var oauthScopes: [String] {
+        ["https://www.googleapis.com/auth/documents"]
+    }
+
+    public static func serverURL() throws -> URL {
+        try Servers.Server1.url()
+    }
+
     enum Error: Swift.Error {
         case invalidResponse(statusCode: Int)
-    }
-    /// Initializes a Google Docs client using Service Account authentication for server-to-server communication.
-    ///
-    /// This initializer is designed for server applications that need to access Google Docs on behalf of users
-    /// without requiring user interaction. It uses a service account JSON file for authentication.
-    ///
-    /// - Parameters:
-    ///   - accountServiceFile: The path to the service account JSON file containing credentials
-    ///   - configuration: The client configuration settings. Defaults to a new Configuration instance
-    ///   - transportConfiguration: The HTTP transport configuration. Defaults to a new AsyncHTTPClientTransport.Configuration
-    ///   - scopes: The OAuth 2.0 scopes to request. Defaults to Google Docs read/write permissions
-    /// - Throws: An error if the service account file cannot be loaded or if initialization fails
-    public init(
-        accountServiceFile: String,
-        configuration: Configuration = .init(),
-        transportConfiguration: AsyncHTTPClientTransport.Configuration = .init(),
-        scopes: [String] = ["https://www.googleapis.com/auth/documents"],
-    ) throws {
-        let tokenManager = try ServiceAccountTokenManager.loadFromFile(
-            accountServiceFile,
-            httpClient: URLSessionHTTPClient(),
-            tokenStorage: nil,
-            scopes: scopes,
-        )
-        self.init(
-            serverURL: try Servers.Server1.url(),
-            configuration: configuration,
-            transport: AsyncHTTPClientTransport(configuration: transportConfiguration),
-            middlewares: [AuthenticationMiddleware(tokenManager: tokenManager, scopes: scopes)],
-        )
     }
 
     /// Performs a batch update operation on a Google Docs document.
