@@ -21,7 +21,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.8.2"),
         .package(
             url: "https://github.com/swift-server/swift-openapi-async-http-client", from: "1.1.0"),
-        .package(url: "https://github.com/ShenghaiWang/GoogleAPITokenManager.git", from: "0.1.2"),
+        .package(url: "https://github.com/ShenghaiWang/GoogleAPITokenManager.git", from: "1.0.0"),
     ],
     targets: [
         .target(

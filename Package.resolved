@@ -1,5 +1,5 @@
 {
-  "originHash" : "c77d78db846a2abe987fccad2f2a36f7d788c542b217214adc709d7e3793a9c2",
+  "originHash" : "654ba733224e61f8e0b0bdfd68203ed676e931279c978f6b1512b4efbecbb911",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ShenghaiWang/GoogleAPITokenManager.git",
       "state" : {
-        "revision" : "b46ddf40e354a7fd1984e659b6763029de5e83d2",
-        "version" : "0.1.2"
+        "revision" : "0c6c65107b4797562e1cf835942ed9fc9e3a3660",
+        "version" : "1.0.0"
       }
     },
     {
