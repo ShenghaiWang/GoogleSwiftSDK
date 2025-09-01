@@ -4,9 +4,9 @@ import OpenAPIAsyncHTTPClient
 import GoogleAPITokenManager
 
 public protocol AuthorizableClient {
-    static var oauthScopes: [String] { get }
-    static var redirectURI: String { get }
-    static func serverURL() throws -> URL
+    static nonisolated var oauthScopes: [String] { get }
+    static nonisolated var redirectURI: String { get }
+    static nonisolated func serverURL() throws -> URL
 
     init(serverURL: Foundation.URL, configuration: Configuration, transport: any ClientTransport, middlewares: [any ClientMiddleware])
     /// Initializes a Gmail client using Service Account authentication for server-to-server communication.
@@ -54,10 +54,9 @@ public protocol AuthorizableClient {
 }
 
 extension AuthorizableClient {
-    public static var redirectURI: String {
+    public static nonisolated var redirectURI: String {
         "http://localhost"
     }
-
 
     public init(
         accountServiceFile: String,
@@ -104,7 +103,6 @@ extension AuthorizableClient {
             middlewares: [AuthenticationMiddleware(tokenManager: tokenManager, scopes: finalScopes)],
         )
     }
-
 
     public init(
         tokenManager: GoogleOAuth2TokenManager,

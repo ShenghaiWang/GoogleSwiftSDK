@@ -5,11 +5,11 @@ import OpenAPIAsyncHTTPClient
 import OpenAPIRuntime
 
 extension Client: AuthorizableClient {
-    public static var oauthScopes: [String] {
+    public static nonisolated var oauthScopes: [String] {
         ["https://www.googleapis.com/auth/presentations"]
     }
 
-    public static func serverURL() throws -> URL {
+    public static nonisolated func serverURL() throws -> URL {
         try Servers.Server1.url()
     }
 
