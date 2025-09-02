@@ -7,6 +7,7 @@ public protocol AuthorizableClient {
     static nonisolated var oauthScopes: [String] { get }
     static nonisolated var redirectURI: String { get }
     static nonisolated func serverURL() throws -> URL
+    static nonisolated var dateTranscoder: any DateTranscoder { get }
 
     init(serverURL: Foundation.URL, configuration: Configuration, transport: any ClientTransport, middlewares: [any ClientMiddleware])
     /// Initializes a Gmail client using Service Account authentication for server-to-server communication.
@@ -20,7 +21,7 @@ public protocol AuthorizableClient {
     ///   - transportConfiguration: The HTTP transport configuration. Defaults to a new AsyncHTTPClientTransport.Configuration
     ///   - scopes: The OAuth 2.0 scopes to request. Defaults to Gmail modify permissions
     /// - Throws: An error if the service account file cannot be loaded or if initialization fails
-    init(accountServiceFile: String, configuration: Configuration, transportConfiguration: AsyncHTTPClientTransport.Configuration, scopes: [String]) throws
+    init(accountServiceFile: String, configuration: Configuration?, transportConfiguration: AsyncHTTPClientTransport.Configuration, scopes: [String]) throws
     /// Initializes a Gmail client using OAuth 2.0 authentication with client credentials.
     ///
     /// This initializer is suitable for applications that need to authenticate users through the OAuth 2.0 flow.
@@ -36,7 +37,7 @@ public protocol AuthorizableClient {
     ///   - tokenStorage: The token storage implementation. Defaults to in-memory storage
     /// - Throws: An error if initialization fails or if the server URL cannot be constructed
 
-    init(clientId: String, clientSecret: String, redirectURI: String, configuration: Configuration, transportConfiguration: AsyncHTTPClientTransport.Configuration, scopes: [String], tokenStorage: (any TokenStorage)?) throws
+    init(clientId: String, clientSecret: String, redirectURI: String, configuration: Configuration?, transportConfiguration: AsyncHTTPClientTransport.Configuration, scopes: [String], tokenStorage: (any TokenStorage)?) throws
 
     /// Initializes a Gmail client using an existing OAuth 2.0 token manager.
     ///
@@ -50,7 +51,7 @@ public protocol AuthorizableClient {
     ///   - scopes: The OAuth 2.0 scopes to request. Defaults to Gmail modify permissions
     ///   - tokenStorage: The token storage implementation. Defaults to in-memory storage
     /// - Throws: An error if initialization fails or if the server URL cannot be constructed
-    init(tokenManager: GoogleOAuth2TokenManager, configuration: Configuration, transportConfiguration: AsyncHTTPClientTransport.Configuration, scopes: [String], tokenStorage: (any TokenStorage)?) throws
+    init(tokenManager: GoogleOAuth2TokenManager, configuration: Configuration?, transportConfiguration: AsyncHTTPClientTransport.Configuration, scopes: [String], tokenStorage: (any TokenStorage)?) throws
 }
 
 extension AuthorizableClient {
@@ -58,9 +59,13 @@ extension AuthorizableClient {
         "http://localhost"
     }
 
+    public static nonisolated var dateTranscoder: any DateTranscoder {
+        .iso8601
+    }
+
     public init(
         accountServiceFile: String,
-        configuration: Configuration = .init(),
+        configuration: Configuration? = nil,
         transportConfiguration: AsyncHTTPClientTransport.Configuration = .init(),
         scopes: [String] = [],
     ) throws {
@@ -73,7 +78,7 @@ extension AuthorizableClient {
         )
         self.init(
             serverURL: try Self.serverURL(),
-            configuration: configuration,
+            configuration: configuration ?? .init(dateTranscoder: Self.dateTranscoder),
             transport: AsyncHTTPClientTransport(configuration: transportConfiguration),
             middlewares: [AuthenticationMiddleware(tokenManager: tokenManager, scopes: finalScopes)],
         )
@@ -83,7 +88,7 @@ extension AuthorizableClient {
         clientId: String,
         clientSecret: String,
         redirectURI: String = "http://localhost",
-        configuration: Configuration = .init(),
+        configuration: Configuration? = nil,
         transportConfiguration: AsyncHTTPClientTransport.Configuration = .init(),
         scopes: [String] = [],
         tokenStorage: (any TokenStorage)? = InMemoeryTokenStorage()
@@ -98,7 +103,7 @@ extension AuthorizableClient {
         )
         self.init(
             serverURL: try Self.serverURL(),
-            configuration: configuration,
+            configuration: configuration ?? .init(dateTranscoder: Self.dateTranscoder),
             transport: AsyncHTTPClientTransport(configuration: transportConfiguration),
             middlewares: [AuthenticationMiddleware(tokenManager: tokenManager, scopes: finalScopes)],
         )
@@ -106,7 +111,7 @@ extension AuthorizableClient {
 
     public init(
         tokenManager: GoogleOAuth2TokenManager,
-        configuration: Configuration = .init(),
+        configuration: Configuration? = nil,
         transportConfiguration: AsyncHTTPClientTransport.Configuration = .init(),
         scopes: [String] = [],
         tokenStorage: (any TokenStorage)? = InMemoeryTokenStorage()
@@ -114,9 +119,10 @@ extension AuthorizableClient {
         let finalScopes = scopes.isEmpty ? Self.oauthScopes : scopes
         self.init(
             serverURL: try Self.serverURL(),
-            configuration: configuration,
+            configuration: configuration ?? .init(dateTranscoder: Self.dateTranscoder),
             transport: AsyncHTTPClientTransport(configuration: transportConfiguration),
             middlewares: [AuthenticationMiddleware(tokenManager: tokenManager, scopes: finalScopes)],
         )
     }
 }
+

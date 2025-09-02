@@ -6,8 +6,12 @@ import PackageDescription
 let package = Package(
     name: "GoogleSwiftSDK",
     platforms: [
-        .macOS(.v10_15),
-        .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .visionOS(.v1),
+        .macOS("13.0"),
+        .macCatalyst("16.0"),
+        .iOS("16.0"),
+        .watchOS("9.0"),
+        .tvOS("16.0"),
+        .visionOS("1.0"),
     ],
     products: [
         .library(name: "GoogleSheetsSDK", targets: ["GoogleSheetsSDK"]),

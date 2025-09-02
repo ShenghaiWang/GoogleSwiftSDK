@@ -2,10 +2,10 @@ import Foundation
 
 // Featues that use service account
 if let serviceAccountFile = ProcessInfo.processInfo.environment["GOOGLE_SERVICE_ACCOUNT_PATH"] {
-    try await GoogleSheets.run(with: serviceAccountFile)
-    //try await GoogleSlides.run(with: serviceAccountFile)
-    //try await GoogleDocs.run(with: serviceAccountFile)
-    //try await GoogleCalendar.run(with: serviceAccountFile)
+//    try await GoogleSheets.run(with: serviceAccountFile)
+//    try await GoogleSlides.run(with: serviceAccountFile)
+//    try await GoogleDocs.run(with: serviceAccountFile)
+    try await GoogleCalendar.run(with: serviceAccountFile)
 }
 
 // Features that use OAuth

@@ -4,7 +4,11 @@ import OpenAPIAsyncHTTPClient
 import OpenAPIRuntime
 import Foundation
 
-extension Client: AuthorizableClient {
+extension Client: AuthorizableClient {    
+    public static nonisolated var dateTranscoder: any DateTranscoder {
+        CalendarDateTranscoder()
+    }
+
     public static nonisolated var oauthScopes: [String] {
         ["https://www.googleapis.com/auth/calendar"]
     }
@@ -61,5 +65,17 @@ extension Client: AuthorizableClient {
                 )
             )
         )
+    }
+}
+
+struct CalendarDateTranscoder: DateTranscoder {
+    func decode(_ dateString: String) throws -> Date {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter.date(from: dateString) ?? Date()
+    }
+
+    func encode(_ date: Date) -> String {
+        date.ISO8601Format()
     }
 }
