@@ -13,10 +13,6 @@ extension Client: AuthorizableClient {
         try Servers.Server1.url()
     }
 
-    enum Error: Swift.Error {
-        case invalidResponse(statusCode: Int)
-    }
-
     /// Performs a batch update operation on a Google Docs document.
     ///
     /// This method allows you to apply multiple changes to a document in a single API call.
@@ -51,14 +47,8 @@ extension Client: AuthorizableClient {
     public func docs_documents_get(
         documentId: String,
     ) async throws -> Components.Schemas.Document {
-        switch try await docs_documents_get(.init(path: .init(documentId: documentId))) {
-        case let .ok(value):
-            switch value.body {
-            case let .json(document): document
-            }
-        case let .undocumented(statusCode: code, _):
-            throw Error.invalidResponse(statusCode: code)
-        }
+        let result = try await docs_documents_get(.init(path: .init(documentId: documentId)))
+        return try await ResponseHandler.extractJSON(from: result)
     }
 }
 

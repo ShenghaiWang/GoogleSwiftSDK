@@ -48,8 +48,8 @@ extension Client: AuthorizableClient {
         location: String?,
         attendees: [String],
         sendUpdates: String? = nil
-    ) async throws -> Operations.Calendar_events_insert.Output {
-        try await calendar_events_insert(
+    ) async throws -> Components.Schemas.Event {
+        let result = try await calendar_events_insert(
             path: .init(calendarId: calendarId),
             query: .init(sendUpdates: .all),
             body: .json(
@@ -65,6 +65,7 @@ extension Client: AuthorizableClient {
                 )
             )
         )
+        return try await ResponseHandler.extractJSON(from: result)
     }
 }
 

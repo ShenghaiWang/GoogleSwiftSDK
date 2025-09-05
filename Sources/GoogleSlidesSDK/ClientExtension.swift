@@ -28,11 +28,12 @@ extension Client: AuthorizableClient {
     public func slides_presentations_batchUpdate(
         presentationId: String,
         requests: [Components.Schemas.Request]
-    ) async throws -> Operations.Slides_presentations_batchUpdate.Output {
+    ) async throws -> Components.Schemas.BatchUpdatePresentationResponse {
         let input = Operations.Slides_presentations_batchUpdate.Input(
             path: .init(presentationId: presentationId),
             body: .json(.init(requests: requests))
         )
-        return try await slides_presentations_batchUpdate(input)
+        let result = try await slides_presentations_batchUpdate(input)
+        return try await ResponseHandler.extractJSON(from: result)
     }
 }

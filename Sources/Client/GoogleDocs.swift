@@ -50,7 +50,7 @@ enum GoogleDocs {
         let requests: [Components.Schemas.Request] = [
             insertTextRequest,
 //            updateTextStyle,
-//            insertInlineImageRequest,
+            insertInlineImageRequest,
         ]
 
         do {

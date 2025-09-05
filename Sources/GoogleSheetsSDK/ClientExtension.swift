@@ -31,8 +31,8 @@ extension Client: AuthorizableClient {
         sheetName: String,
         range: String? = nil,
         values: [[OpenAPIRuntime.OpenAPIValueContainer]],
-    ) async throws -> Operations.Sheets_spreadsheets_values_append.Output {
-        try await sheets_spreadsheets_values_append(
+    ) async throws -> Components.Schemas.AppendValuesResponse {
+        let result = try await sheets_spreadsheets_values_append(
             .init(
                 path: .init(
                     spreadsheetId: spreadsheetId,
@@ -49,5 +49,6 @@ extension Client: AuthorizableClient {
                 )
             )
         )
+        return try await ResponseHandler.extractJSON(from: result)
     }
 }

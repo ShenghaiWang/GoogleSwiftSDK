@@ -13,10 +13,6 @@ extension Client: AuthorizableClient {
         try Servers.Server1.url()
     }
 
-    enum Error: Swift.Error {
-        case invalidResponse(statusCode: Int)
-    }
-
     /// Creates a new Gmail draft with the specified recipients, subject, and body.
     ///
     /// This method creates a draft email that can be sent later. The draft is created using the Gmail API
@@ -32,7 +28,7 @@ extension Client: AuthorizableClient {
         to: [String],
         subject: String,
         body: String
-    ) async throws -> Operations.Gmail_users_drafts_create.Output {
+    ) async throws -> Components.Schemas.Draft {
         let mime = buildMime(to: to, subject: subject, body: body)
         let base64UrlString = Data(mime.utf8).base64URLEncodedString()
         let draftJson = """
@@ -43,13 +39,13 @@ extension Client: AuthorizableClient {
             }
         """
         let jsonData = Data(draftJson.utf8)
-        return try await gmail_users_drafts_create(
+        let result = try await gmail_users_drafts_create(
             .init(
                 path: .init(userId: "me"),
                 body: .messageRfc822(.init(jsonData))
             )
         )
-
+        return try await ResponseHandler.extractJSON(from: result)
     }
 
     // IMPORTANT: CRLF (`\r\n`) + exactly one blank line before body.

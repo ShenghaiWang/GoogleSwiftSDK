@@ -19,6 +19,7 @@ let package = Package(
         .library(name: "GoogleDocsSDK", targets: ["GoogleDocsSDK"]),
         .library(name: "GoogleCalendarSDK", targets: ["GoogleCalendarSDK"]),
         .library(name: "GoogleGmailSDK", targets: ["GoogleGmailSDK"]),
+        .library(name: "GoogleDriveSDK", targets: ["GoogleDriveSDK"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.10.2"),
@@ -46,6 +47,7 @@ let package = Package(
                 "GoogleDocsSDK",
                 "GoogleCalendarSDK",
                 "GoogleGmailSDK",
+                "GoogleDriveSDK",
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(
                     name: "OpenAPIAsyncHTTPClient", package: "swift-openapi-async-http-client"),
@@ -97,6 +99,16 @@ let package = Package(
         ),
         .target(
             name: "GoogleGmailSDK",
+            dependencies: [
+                "Common",
+                .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
+                .product(
+                    name: "OpenAPIAsyncHTTPClient", package: "swift-openapi-async-http-client"),
+                .product(name: "GoogleAPITokenManager", package: "GoogleAPITokenManager"),
+            ]
+        ),
+        .target(
+            name: "GoogleDriveSDK",
             dependencies: [
                 "Common",
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
